@@ -8,15 +8,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <meta name="description" content="Table Partitionby xiaoliangliang 什么是 Table PartitionTable Partition 是指根据一定规则，将数据库中的一张表分解成多个更小的容易管理的部分。从逻辑上看只有一张表，但是底层却是由多个物理分区组成。通俗地讲分区表是将一大表，根据条件分割成若干个小表，相信对有关系型数据库使用背景的用户来说可能并陌生， TiDB 2.1 准备支持分区表这一特">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Table Partition 源码阅读">
-<meta property="og:url" content="https://ciscoxll.github.io/2018/12/14/Table-Partition/index.html">
+<meta property="og:title" content="TiDB Table Partition 源码阅读">
+<meta property="og:url" content="https://ciscoxll.github.io/2019/04/22/Table-Partition/index.html">
 <meta property="og:site_name" content="ciscoxll">
 <meta property="og:description" content="Table Partitionby xiaoliangliang 什么是 Table PartitionTable Partition 是指根据一定规则，将数据库中的一张表分解成多个更小的容易管理的部分。从逻辑上看只有一张表，但是底层却是由多个物理分区组成。通俗地讲分区表是将一大表，根据条件分割成若干个小表，相信对有关系型数据库使用背景的用户来说可能并陌生， TiDB 2.1 准备支持分区表这一特">
 <meta property="og:locale" content="default">
 <meta property="og:image" content="https://upload-images.jianshu.io/upload_images/542677-79484bc60f7a3edc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
-<meta property="og:updated_time" content="2018-12-13T17:02:28.424Z">
+<meta property="og:updated_time" content="2019-04-22T08:02:35.328Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Table Partition 源码阅读">
+<meta name="twitter:title" content="TiDB Table Partition 源码阅读">
 <meta name="twitter:description" content="Table Partitionby xiaoliangliang 什么是 Table PartitionTable Partition 是指根据一定规则，将数据库中的一张表分解成多个更小的容易管理的部分。从逻辑上看只有一张表，但是底层却是由多个物理分区组成。通俗地讲分区表是将一大表，根据条件分割成若干个小表，相信对有关系型数据库使用背景的用户来说可能并陌生， TiDB 2.1 准备支持分区表这一特">
 <meta name="twitter:image" content="https://upload-images.jianshu.io/upload_images/542677-79484bc60f7a3edc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
     
@@ -38,7 +38,7 @@
         
     
     <!-- title -->
-    <title>Table Partition 源码阅读</title>
+    <title>TiDB Table Partition 源码阅读</title>
     <!-- styles -->
     <link rel="stylesheet" href="/css/style.css">
     <!-- rss -->
@@ -84,16 +84,16 @@
     <br>
     <div id="share" style="display: none">
       <ul>
-  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://ciscoxll.github.io/2018/12/14/Table-Partition/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://twitter.com/share?url=https://ciscoxll.github.io/2018/12/14/Table-Partition/&text=Table Partition 源码阅读"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://ciscoxll.github.io/2018/12/14/Table-Partition/&title=Table Partition 源码阅读"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://ciscoxll.github.io/2018/12/14/Table-Partition/&is_video=false&description=Table Partition 源码阅读"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="mailto:?subject=Table Partition 源码阅读&body=Check out this article: https://ciscoxll.github.io/2018/12/14/Table-Partition/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://getpocket.com/save?url=https://ciscoxll.github.io/2018/12/14/Table-Partition/&title=Table Partition 源码阅读"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://reddit.com/submit?url=https://ciscoxll.github.io/2018/12/14/Table-Partition/&title=Table Partition 源码阅读"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://ciscoxll.github.io/2018/12/14/Table-Partition/&title=Table Partition 源码阅读"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://digg.com/submit?url=https://ciscoxll.github.io/2018/12/14/Table-Partition/&title=Table Partition 源码阅读"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://ciscoxll.github.io/2018/12/14/Table-Partition/&name=Table Partition 源码阅读&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://ciscoxll.github.io/2019/04/22/Table-Partition/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://ciscoxll.github.io/2019/04/22/Table-Partition/&text=TiDB Table Partition 源码阅读"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://ciscoxll.github.io/2019/04/22/Table-Partition/&title=TiDB Table Partition 源码阅读"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://ciscoxll.github.io/2019/04/22/Table-Partition/&is_video=false&description=TiDB Table Partition 源码阅读"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=TiDB Table Partition 源码阅读&body=Check out this article: https://ciscoxll.github.io/2019/04/22/Table-Partition/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://ciscoxll.github.io/2019/04/22/Table-Partition/&title=TiDB Table Partition 源码阅读"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://ciscoxll.github.io/2019/04/22/Table-Partition/&title=TiDB Table Partition 源码阅读"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://ciscoxll.github.io/2019/04/22/Table-Partition/&title=TiDB Table Partition 源码阅读"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://ciscoxll.github.io/2019/04/22/Table-Partition/&title=TiDB Table Partition 源码阅读"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://ciscoxll.github.io/2019/04/22/Table-Partition/&name=TiDB Table Partition 源码阅读&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
 </ul>
 
     </div>
@@ -110,7 +110,7 @@
   <header>
     
     <h1 class="posttitle" itemprop="name headline">
-        Table Partition 源码阅读
+        TiDB Table Partition 源码阅读
     </h1>
 
 
@@ -121,7 +121,7 @@
       </span>
       
     <div class="postdate">
-        <time datetime="2018-12-13T17:02:28.424Z" itemprop="datePublished">2018-12-14</time>
+        <time datetime="2019-04-22T08:02:35.339Z" itemprop="datePublished">2019-04-22</time>
     </div>
 
 
@@ -273,16 +273,16 @@
 
     <div id="share-footer" style="display: none">
       <ul>
-  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://ciscoxll.github.io/2018/12/14/Table-Partition/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://twitter.com/share?url=https://ciscoxll.github.io/2018/12/14/Table-Partition/&text=Table Partition 源码阅读"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://ciscoxll.github.io/2018/12/14/Table-Partition/&title=Table Partition 源码阅读"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://ciscoxll.github.io/2018/12/14/Table-Partition/&is_video=false&description=Table Partition 源码阅读"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="mailto:?subject=Table Partition 源码阅读&body=Check out this article: https://ciscoxll.github.io/2018/12/14/Table-Partition/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://getpocket.com/save?url=https://ciscoxll.github.io/2018/12/14/Table-Partition/&title=Table Partition 源码阅读"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://reddit.com/submit?url=https://ciscoxll.github.io/2018/12/14/Table-Partition/&title=Table Partition 源码阅读"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://ciscoxll.github.io/2018/12/14/Table-Partition/&title=Table Partition 源码阅读"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://digg.com/submit?url=https://ciscoxll.github.io/2018/12/14/Table-Partition/&title=Table Partition 源码阅读"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://ciscoxll.github.io/2018/12/14/Table-Partition/&name=Table Partition 源码阅读&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://ciscoxll.github.io/2019/04/22/Table-Partition/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://ciscoxll.github.io/2019/04/22/Table-Partition/&text=TiDB Table Partition 源码阅读"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://ciscoxll.github.io/2019/04/22/Table-Partition/&title=TiDB Table Partition 源码阅读"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://ciscoxll.github.io/2019/04/22/Table-Partition/&is_video=false&description=TiDB Table Partition 源码阅读"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=TiDB Table Partition 源码阅读&body=Check out this article: https://ciscoxll.github.io/2019/04/22/Table-Partition/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://ciscoxll.github.io/2019/04/22/Table-Partition/&title=TiDB Table Partition 源码阅读"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://ciscoxll.github.io/2019/04/22/Table-Partition/&title=TiDB Table Partition 源码阅读"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://ciscoxll.github.io/2019/04/22/Table-Partition/&title=TiDB Table Partition 源码阅读"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://ciscoxll.github.io/2019/04/22/Table-Partition/&title=TiDB Table Partition 源码阅读"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://ciscoxll.github.io/2019/04/22/Table-Partition/&name=TiDB Table Partition 源码阅读&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
 </ul>
 
     </div>
